@@ -10,8 +10,7 @@ import net.arathain.charter.entity.SlowFallEntity;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
-import net.fabricmc.fabric.api.client.rendereregistry.v1.BlockEntityRendererRegistry;
-import net.fabricmc.fabric.api.client.rendereregistry.v1.EntityRendererRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.entity.EntityPose;
@@ -21,10 +20,11 @@ import net.minecraft.util.registry.Registry;
 
 public class CharterClient implements ClientModInitializer {
     public static ParticleType<BindingAmbienceParticleEffect> BINDING;
+
     @Override
     public void onInitializeClient() {
-        BlockEntityRendererRegistry.INSTANCE.register(Charter.CHARTER_STONE_ENTITY, (BlockEntityRendererFactory.Context rendererDispatcherIn) -> new CharterStoneRenderer());
-        BlockEntityRendererRegistry.INSTANCE.register(Charter.WAYSTONE_ENTITY, (BlockEntityRendererFactory.Context rendererDispatcherIn) -> new WaystoneRenderer());
+        BlockEntityRendererRegistry.register(Charter.CHARTER_STONE_ENTITY, (BlockEntityRendererFactory.Context rendererDispatcherIn) -> new CharterStoneRenderer());
+        BlockEntityRendererRegistry.register(Charter.WAYSTONE_ENTITY, (BlockEntityRendererFactory.Context rendererDispatcherIn) -> new WaystoneRenderer());
         BINDING = Registry.register(Registry.PARTICLE_TYPE, "charter:bound", new ParticleType<BindingAmbienceParticleEffect>(true, BindingAmbienceParticleEffect.PARAMETERS_FACTORY) {
             @Override
             public Codec<BindingAmbienceParticleEffect> getCodec() {
@@ -35,8 +35,7 @@ public class CharterClient implements ClientModInitializer {
         ClientTickEvents.END_WORLD_TICK.register(world -> {
             PlayerEntity player = MinecraftClient.getInstance().player;
             if (player != null) {
-                UpdateShadePacket.send(player.getPose() == EntityPose.FALL_FLYING || ((SlowFallEntity) player).isSlowFalling());
-
+                UpdateShadePacket.send(player.getPose() == EntityPose.FALL_FLYING || ((SlowFallEntity) player).charter$isSlowFalling());
             }
         });
     }

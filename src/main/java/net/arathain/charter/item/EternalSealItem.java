@@ -18,17 +18,16 @@ public class EternalSealItem extends Item {
 
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
-        if(!world.isClient)
-        {
+        if (!world.isClient) {
             ServerPlayerEntity player = (ServerPlayerEntity) entity;
 
             for (ItemStack itemStack : player.getInventory().main) {
-                if(!itemStack.isEmpty() && ContractItem.isViable(itemStack)) {
-                     if(world.getPlayerByUuid(ContractItem.getIndebtedUUID(itemStack)) != null && world.getPlayerByUuid(ContractItem.getIndebtedUUID(itemStack)) != player) {
-                         PlayerEntity indebted = world.getPlayerByUuid(ContractItem.getIndebtedUUID(itemStack));
-                         assert indebted != null;
-                         indebted.addStatusEffect(new StatusEffectInstance(Charter.ETERNAL_DEBT, 1600, 0, false, false));
-                     }
+                if (!itemStack.isEmpty() && ContractItem.isViable(itemStack)) {
+                    if (world.getPlayerByUuid(ContractItem.getIndebtedUUID(itemStack)) != null && world.getPlayerByUuid(ContractItem.getIndebtedUUID(itemStack)) != player) {
+                        PlayerEntity indebted = world.getPlayerByUuid(ContractItem.getIndebtedUUID(itemStack));
+                        assert indebted != null;
+                        indebted.addStatusEffect(new StatusEffectInstance(Charter.ETERNAL_DEBT, 1600, 0, false, false));
+                    }
                 }
             }
 

@@ -11,18 +11,19 @@ public class CharterMarksModel extends AnimatedGeoModel<CharterStoneEntity> {
     private static final Identifier TEXTURE_IDENTIFIER = new Identifier(Charter.MODID, "textures/block/charter_stone.png");
     private static final Identifier MODEL_IDENTIFIER = new Identifier(Charter.MODID, "geo/charter_marks.geo.json");
     private static final Identifier ANIMATION_IDENTIFIER = new Identifier(Charter.MODID, "animations/charter_marks.animation.json");
+
     @Override
-    public Identifier getModelLocation(CharterStoneEntity object) {
+    public Identifier getModelResource(CharterStoneEntity object) {
         return MODEL_IDENTIFIER;
     }
 
     @Override
-    public Identifier getTextureLocation(CharterStoneEntity object) {
+    public Identifier getTextureResource(CharterStoneEntity object) {
         return TEXTURE_IDENTIFIER;
     }
 
     @Override
-    public Identifier getAnimationFileLocation(CharterStoneEntity animatable) {
+    public Identifier getAnimationResource(CharterStoneEntity animatable) {
         return ANIMATION_IDENTIFIER;
     }
 

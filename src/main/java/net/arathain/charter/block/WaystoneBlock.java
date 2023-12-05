@@ -21,17 +21,19 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.Nullable;
+import net.minecraft.util.math.random.Random;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class WaystoneBlock extends Block implements BlockEntityProvider {
     public static final VoxelShape SHAPE = createCuboidShape(2, 0, 2, 14, 16, 14);
+
     public WaystoneBlock(Settings settings) {
         super(settings);
         setDefaultState(getDefaultState().with(Properties.LIT, false));
     }
+
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return SHAPE;
@@ -50,10 +52,10 @@ public class WaystoneBlock extends Block implements BlockEntityProvider {
 
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
-        if(world.getBlockEntity(pos) != null && world.getBlockEntity(pos) instanceof WaystoneEntity && placer instanceof PlayerEntity) {
+        if (world.getBlockEntity(pos) != null && world.getBlockEntity(pos) instanceof WaystoneEntity && placer instanceof PlayerEntity) {
             CharterComponent charter = CharterUtil.getCharterAtPos(pos, world);
 
-            if(charter != null) {
+            if (charter != null) {
                 charter.addWaystone(pos);
                 world.setBlockState(pos, state.with(Properties.LIT, true));
             } else {
@@ -76,10 +78,11 @@ public class WaystoneBlock extends Block implements BlockEntityProvider {
         }
         super.onBroken(world, pos, state);
     }
+
     @Override
     public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
         super.randomDisplayTick(state, world, pos, random);
-        if(state.get(Properties.LIT)) {
+        if (state.get(Properties.LIT)) {
             int i = pos.getX();
             int j = pos.getY();
             int k = pos.getZ();

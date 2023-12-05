@@ -22,10 +22,10 @@ public class BindingAmbienceParticle extends SpriteBillboardParticle {
 
     private BindingAmbienceParticle(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, BindingAmbienceParticleEffect bindingParticleEffect, SpriteProvider spriteProvider) {
         super(world, x, y, z, velocityX, velocityY, velocityZ);
-        this.colorAlpha = bindingParticleEffect.getAlpha();
-        this.colorRed = bindingParticleEffect.getRed();
-        this.colorGreen = bindingParticleEffect.getGreen();
-        this.colorBlue = bindingParticleEffect.getBlue();
+        this.alpha = bindingParticleEffect.getAlpha();
+        this.red = bindingParticleEffect.getRed();
+        this.green = bindingParticleEffect.getGreen();
+        this.blue = bindingParticleEffect.getBlue();
         this.redEvolution = bindingParticleEffect.getRedEvolution();
         this.greenEvolution = bindingParticleEffect.getGreenEvolution();
         this.blueEvolution = bindingParticleEffect.getBlueEvolution();
@@ -48,21 +48,21 @@ public class BindingAmbienceParticle extends SpriteBillboardParticle {
 
         // fade and die
         if (this.age++ >= this.maxAge) {
-            colorAlpha -= 0.004f;
+            alpha -= 0.004f;
         }
-        if (this.age++ <= 30 ) {
-            this.colorAlpha = Math.max(0, this.colorAlpha + 0.03f);
+        if (this.age++ <= 30) {
+            this.alpha = Math.max(0, this.alpha + 0.03f);
         } else {
-            this.colorAlpha = Math.max(0, this.colorAlpha - 0.001f);
+            this.alpha = Math.max(0, this.alpha - 0.001f);
         }
 
-        if (colorAlpha < 0f || this.scale <= 0f) {
+        if (alpha < 0f || this.scale <= 0f) {
             this.markDead();
         }
 
-        colorRed = MathHelper.clamp(colorRed + redEvolution, 0, 1);
-        colorGreen = MathHelper.clamp(colorGreen + greenEvolution, 0, 1);
-        colorBlue = MathHelper.clamp(colorBlue + blueEvolution, 0, 1);
+        red = MathHelper.clamp(red + redEvolution, 0, 1);
+        green = MathHelper.clamp(green + greenEvolution, 0, 1);
+        blue = MathHelper.clamp(blue + blueEvolution, 0, 1);
 
         this.velocityY -= 0.0001;
         this.velocityX = 0;
@@ -103,10 +103,10 @@ public class BindingAmbienceParticle extends SpriteBillboardParticle {
         float maxV = this.getMaxV();
         int l = 15728880;
 
-        vertexConsumer.vertex(Vec3fs[0].getX(), Vec3fs[0].getY(), Vec3fs[0].getZ()).texture(maxU, maxV).color(colorRed, colorGreen, colorBlue, colorAlpha).light(l).next();
-        vertexConsumer.vertex(Vec3fs[1].getX(), Vec3fs[1].getY(), Vec3fs[1].getZ()).texture(maxU, minV).color(colorRed, colorGreen, colorBlue, colorAlpha).light(l).next();
-        vertexConsumer.vertex(Vec3fs[2].getX(), Vec3fs[2].getY(), Vec3fs[2].getZ()).texture(minU, minV).color(colorRed, colorGreen, colorBlue, colorAlpha).light(l).next();
-        vertexConsumer.vertex(Vec3fs[3].getX(), Vec3fs[3].getY(), Vec3fs[3].getZ()).texture(minU, maxV).color(colorRed, colorGreen, colorBlue, colorAlpha).light(l).next();
+        vertexConsumer.vertex(Vec3fs[0].getX(), Vec3fs[0].getY(), Vec3fs[0].getZ()).texture(maxU, maxV).color(red, green, blue, alpha).light(l).next();
+        vertexConsumer.vertex(Vec3fs[1].getX(), Vec3fs[1].getY(), Vec3fs[1].getZ()).texture(maxU, minV).color(red, green, blue, alpha).light(l).next();
+        vertexConsumer.vertex(Vec3fs[2].getX(), Vec3fs[2].getY(), Vec3fs[2].getZ()).texture(minU, minV).color(red, green, blue, alpha).light(l).next();
+        vertexConsumer.vertex(Vec3fs[3].getX(), Vec3fs[3].getY(), Vec3fs[3].getZ()).texture(minU, maxV).color(red, green, blue, alpha).light(l).next();
     }
 
     @Environment(EnvType.CLIENT)

@@ -18,7 +18,7 @@ public class CharterOwnerComponent implements AutoSyncedComponent {
     }
 
     public void setShade(boolean shade) {
-        if(CharterUtil.isCharterOwner(obj, obj.getWorld())) {
+        if (CharterUtil.ownsCurrentCharter(obj.getBlockPos(), obj, obj.getWorld())) {
             this.shade = shade;
             CharterComponents.CHARTER_OWNER_COMPONENT.sync(obj);
         }
@@ -28,6 +28,7 @@ public class CharterOwnerComponent implements AutoSyncedComponent {
     public void readFromNbt(NbtCompound tag) {
         setShade(tag.getBoolean("shade"));
     }
+
     @Override
     public void writeToNbt(NbtCompound tag) {
         tag.putBoolean("shade", isShade());

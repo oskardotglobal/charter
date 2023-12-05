@@ -16,8 +16,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
+import net.minecraft.util.math.random.Random;
 
-import java.util.Random;
 
 public class CharterVesselBlock extends Block {
     public CharterVesselBlock(Settings settings) {

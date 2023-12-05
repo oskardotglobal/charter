@@ -30,27 +30,27 @@ public class CharterWorldComponent implements AutoSyncedComponent {
         CharterComponents.CHARTERS.sync(zaWarudo);
         charters.forEach(CharterComponent::tick);
         CharterComponents.CHARTERS.get(zaWarudo).getCharters().forEach(charter -> {
-            if(zaWarudo.getBlockState(charter.getCharterStonePos()).getBlock() != Charter.CHARTER_STONE) {
+            if (zaWarudo.getBlockState(charter.getCharterStonePos()).getBlock() != Charter.CHARTER_STONE) {
                 charter.getAreas().forEach(area -> {
                     BlockState state = zaWarudo.getBlockState(new BlockPos(area.getCenter().x, area.getCenter().y, area.getCenter().z));
-                    if(state.getBlock() instanceof WaystoneBlock) {
+                    if (state.getBlock() instanceof WaystoneBlock) {
                         zaWarudo.breakBlock(new BlockPos(area.getCenter().x, area.getCenter().y, area.getCenter().z), false);
                         zaWarudo.setBlockState(new BlockPos(area.getCenter().x, area.getCenter().y, area.getCenter().z), Charter.BROKEN_WAYSTONE.getDefaultState());
                     }
-                    if(state.getBlock() instanceof CharterStoneBlock) {
+                    if (state.getBlock() instanceof CharterStoneBlock) {
                         zaWarudo.breakBlock(new BlockPos(area.getCenter().x, area.getCenter().y, area.getCenter().z), false);
                         zaWarudo.setBlockState(new BlockPos(area.getCenter().x, area.getCenter().y, area.getCenter().z), Charter.BROKEN_CHARTER_STONE.getDefaultState());
                     }
                 });
                 charter.getMembers().forEach(member -> {
                     PlayerEntity player = zaWarudo.getPlayerByUuid(member);
-                    if(player != null) {
+                    if (player != null) {
                         player.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 100, 5));
                     }
                 });
             }
 
-                });
+        });
         CharterComponents.CHARTERS.get(zaWarudo).getCharters().removeIf(charter -> zaWarudo.getBlockState(charter.getCharterStonePos()).getBlock() != Charter.CHARTER_STONE);
 
         CharterComponents.CHARTERS.sync(zaWarudo);
@@ -63,16 +63,18 @@ public class CharterWorldComponent implements AutoSyncedComponent {
         list.forEach(charterCompound -> {
             UUID charterOwner = ((NbtCompound) charterCompound).getCompound(Charter.MODID).getUuid("CharterOwner");
 
-            Optional<CharterComponent> charter = charters.stream().filter(existingCharter -> existingCharter.getCharterOwnerUuid() == charterOwner).findFirst();
-
-            if (charter.isPresent()) {
-                charter.get().readFromNbt((NbtCompound) charterCompound);
-            } else {
+            if (charters.stream().filter(charterComponent -> charterComponent.getCharterOwnerUuid() == charterOwner).findFirst().isEmpty()) {
                 CharterComponent charterComponent = new CharterComponent(zaWarudo);
-
                 charterComponent.readFromNbt((NbtCompound) charterCompound);
-
                 charters.add(charterComponent);
+
+                return;
+            }
+
+            for (CharterComponent charter : charters) {
+                if (charter.getCharterOwnerUuid() == charterOwner) {
+                    charter.readFromNbt((NbtCompound) charterCompound);
+                }
             }
         });
 
@@ -84,9 +86,7 @@ public class CharterWorldComponent implements AutoSyncedComponent {
 
         charters.forEach(charterComponent -> {
             NbtCompound charterNbt = new NbtCompound();
-
             charterComponent.writeToNbt(charterNbt);
-
             list.add(charterNbt);
         });
 

@@ -20,6 +20,7 @@ public class PlayerEntityRendererMixin {
             callbackInfo.cancel();
         }
     }
+
     @Inject(method = "renderArm", at = @At("HEAD"), cancellable = true)
     private void renderArm(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, AbstractClientPlayerEntity player, ModelPart arm, ModelPart sleeve, CallbackInfo ci) {
         if (CharterComponents.CHARTER_OWNER_COMPONENT.get(player).isShade()) {

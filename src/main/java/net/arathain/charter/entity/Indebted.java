@@ -3,6 +3,7 @@ package net.arathain.charter.entity;
 import java.util.UUID;
 
 public interface Indebted {
-    UUID getCharterUUID();
-    void setCharterUUID(UUID charterUUID);
+    UUID charter$getCharterUUID();
+
+    void charter$setCharterUUID(UUID charterUUID);
 }

@@ -15,24 +15,8 @@ import net.minecraft.util.registry.Registry;
 import java.util.Locale;
 
 public class BindingAmbienceParticleEffect implements ParticleEffect {
-    public static final Codec<BindingAmbienceParticleEffect> CODEC = RecordCodecBuilder.create((instance) -> {
-        return instance.group(Codec.FLOAT.fieldOf("r").forGetter((bindParticleEffect) -> {
-            return bindParticleEffect.red;
-        }), Codec.FLOAT.fieldOf("g").forGetter((bindParticleEffect) -> {
-            return bindParticleEffect.green;
-        }), Codec.FLOAT.fieldOf("b").forGetter((bindParticleEffect) -> {
-            return bindParticleEffect.blue;
-        }), Codec.FLOAT.fieldOf("re").forGetter((bindParticleEffect) -> {
-            return bindParticleEffect.redEvolution;
-        }), Codec.FLOAT.fieldOf("ge").forGetter((bindParticleEffect) -> {
-            return bindParticleEffect.greenEvolution;
-        }), Codec.FLOAT.fieldOf("be").forGetter((bindParticleEffect) -> {
-            return bindParticleEffect.blueEvolution;
-        }), Codec.FLOAT.fieldOf("a").forGetter((bindParticleEffect) -> {
-            return bindParticleEffect.alpha;
-        })).apply(instance, BindingAmbienceParticleEffect::new);
-    });
-    public static final ParticleEffect.Factory<BindingAmbienceParticleEffect> PARAMETERS_FACTORY = new ParticleEffect.Factory<BindingAmbienceParticleEffect>() {
+    public static final Codec<BindingAmbienceParticleEffect> CODEC = RecordCodecBuilder.create((instance) -> instance.group(Codec.FLOAT.fieldOf("r").forGetter((bindParticleEffect) -> bindParticleEffect.red), Codec.FLOAT.fieldOf("g").forGetter((bindParticleEffect) -> bindParticleEffect.green), Codec.FLOAT.fieldOf("b").forGetter((bindParticleEffect) -> bindParticleEffect.blue), Codec.FLOAT.fieldOf("re").forGetter((bindParticleEffect) -> bindParticleEffect.redEvolution), Codec.FLOAT.fieldOf("ge").forGetter((bindParticleEffect) -> bindParticleEffect.greenEvolution), Codec.FLOAT.fieldOf("be").forGetter((bindParticleEffect) -> bindParticleEffect.blueEvolution), Codec.FLOAT.fieldOf("a").forGetter((bindParticleEffect) -> bindParticleEffect.alpha)).apply(instance, BindingAmbienceParticleEffect::new));
+    public static final ParticleEffect.Factory<BindingAmbienceParticleEffect> PARAMETERS_FACTORY = new ParticleEffect.Factory<>() {
         public BindingAmbienceParticleEffect read(ParticleType<BindingAmbienceParticleEffect> particleType, StringReader stringReader) throws CommandSyntaxException {
             stringReader.expect(' ');
             float r = (float) stringReader.readDouble();

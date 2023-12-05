@@ -13,6 +13,7 @@ public interface SendHelpComponent {
     List<UUID> members = new ArrayList<>();
 
     BlockPos getCharterStonePos();
+
     UUID getCharterOwnerUuid();
 
 }

@@ -19,9 +19,11 @@ import net.minecraft.world.World;
 
 public class PactPressBlockEntity extends BlockEntity implements AelpecyemIsCool {
     private final DefaultedList<ItemStack> ITEMS = DefaultedList.ofSize(1, ItemStack.EMPTY);
+
     public PactPressBlockEntity(BlockPos pos, BlockState state) {
         super(Charter.PACT_PRESS_ENTITY, pos, state);
     }
+
     public PactPressBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
@@ -31,7 +33,7 @@ public class PactPressBlockEntity extends BlockEntity implements AelpecyemIsCool
         if (tickerWorld != null) {
             BlockState state = tickerWorld.getBlockState(pos.offset(Direction.DOWN).offset(Direction.DOWN));
             if (tickerState.get(Properties.LIT) && blockEntity.isValid(0, blockEntity.getContract()) && state.isOf(Blocks.SOUL_FIRE) || state.isOf(Blocks.SOUL_LANTERN) || state.isOf(Blocks.SOUL_CAMPFIRE) || state.isOf(Blocks.SOUL_TORCH) || state.isOf(Blocks.SOUL_WALL_TORCH)) {
-                if(!tickerWorld.isClient() && ContractItem.getIndebtedUUID(blockEntity.getContract()) != null && tickerWorld.getPlayerByUuid(ContractItem.getIndebtedUUID(blockEntity.getContract())) != null) {
+                if (!tickerWorld.isClient() && ContractItem.getIndebtedUUID(blockEntity.getContract()) != null && tickerWorld.getPlayerByUuid(ContractItem.getIndebtedUUID(blockEntity.getContract())) != null) {
                     PlayerEntity player = tickerWorld.getPlayerByUuid(ContractItem.getIndebtedUUID(blockEntity.getContract()));
                     assert player != null;
                     player.addStatusEffect(new StatusEffectInstance(Charter.SOUL_STRAIN, 16000, 0, true, true));
@@ -45,10 +47,12 @@ public class PactPressBlockEntity extends BlockEntity implements AelpecyemIsCool
     public void writeNbt(NbtCompound tag) {
         super.writeNbt(toClientTag(tag));
     }
+
     public void fromClientTag(NbtCompound tag) {
         ITEMS.clear();
         Inventories.readNbt(tag, ITEMS);
     }
+
     public NbtCompound toClientTag(NbtCompound tag) {
         Inventories.writeNbt(tag, ITEMS);
         return tag;
@@ -80,7 +84,6 @@ public class PactPressBlockEntity extends BlockEntity implements AelpecyemIsCool
     public ItemStack getContract() {
         return getStack(0);
     }
-
 
 
 }

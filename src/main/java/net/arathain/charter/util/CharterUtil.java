@@ -5,12 +5,10 @@ import net.arathain.charter.components.CharterComponents;
 import net.arathain.charter.entity.SlowFallEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -44,20 +42,45 @@ public class CharterUtil {
         }
         return component;
     }
+
     public static boolean isInCharter(PlayerEntity player, World world) {
         List<CharterComponent> charters = CharterComponents.CHARTERS.get(world).getCharters();
         for (CharterComponent potentialComponent : charters) {
             List<UUID> memberList2 = new ArrayList<>(potentialComponent.getMembers());
-            for(UUID uuid : memberList2) {
-                if(uuid.equals(player.getUuid())) {
+            for (UUID uuid : memberList2) {
+                if (uuid.equals(player.getUuid())) {
                     return true;
                 }
             }
         }
         return false;
     }
-    public static boolean isCharterOwner(LivingEntity player, World world) {
-        if(player instanceof PlayerEntity) {
+
+    public static boolean isInCharter(UUID player, World world) {
+        List<CharterComponent> charters = CharterComponents.CHARTERS.get(world).getCharters();
+        for (CharterComponent potentialComponent : charters) {
+            List<UUID> memberList2 = new ArrayList<>(potentialComponent.getMembers());
+            for (UUID uuid : memberList2) {
+                if (uuid.equals(player)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean ownsCurrentCharter(BlockPos pos, PlayerEntity player, World world) {
+        if (!isInCharter(player, world)) return false;
+        return getCharterAtPos(pos, world).getCharterOwnerUuid() == player.getUuid();
+    }
+
+    public static boolean ownsCurrentCharter(BlockPos pos, UUID player, World world) {
+        if (!isInCharter(player, world)) return false;
+        return getCharterAtPos(pos, world).getCharterOwnerUuid() == player;
+    }
+
+    public static boolean ownsCharter(LivingEntity player, World world) {
+        if (player instanceof PlayerEntity) {
             List<CharterComponent> charters = CharterComponents.CHARTERS.get(world).getCharters();
             for (CharterComponent potentialComponent : charters) {
                 if (potentialComponent.getCharterOwnerUuid().equals(player.getUuid())) {
@@ -67,8 +90,9 @@ public class CharterUtil {
         }
         return false;
     }
+
     public static void applySpeed(PlayerEntity player) {
-        ((SlowFallEntity) player).setSlowFalling(false);
+        ((SlowFallEntity) player).charter$setSlowFalling(false);
         Vec3d rotation = player.getRotationVector();
         Vec3d velocity = player.getVelocity();
         float speed = (0.02f * (player.getPitch() < -75 && player.getPitch() > -105 ? 3F : 1.5F));
@@ -77,10 +101,11 @@ public class CharterUtil {
                 rotation.y * speed + (rotation.y * 1.5D - velocity.y) * speed,
                 rotation.z * speed + (rotation.z * 1.5D - velocity.z) * speed));
     }
-    public static void stopFlying(PlayerEntity player) {
-        ((SlowFallEntity) player).setSlowFalling(true);
 
-        if(player.getPitch() < -90 || player.getPitch() > 90) {
+    public static void stopFlying(PlayerEntity player) {
+        ((SlowFallEntity) player).charter$setSlowFalling(true);
+
+        if (player.getPitch() < -90 || player.getPitch() > 90) {
             float offset = (player.getPitch() < -90 ? player.getPitch() + 180 : player.getPitch() - 180) * 2;
             player.setPitch((player.getPitch() < -90 ? 180 + offset : -180 - offset) + player.getPitch());
             player.setYaw(180 + player.getYaw());

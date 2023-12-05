@@ -29,6 +29,7 @@ public class MerchantCrestItem extends Item {
         stack.getOrCreateNbt().putBoolean("teleported", teleported);
         return stack;
     }
+
     public static boolean getTeleported(ItemStack stack) {
         assert stack.getNbt() != null;
         return stack.getNbt().getBoolean("teleported");
@@ -49,20 +50,20 @@ public class MerchantCrestItem extends Item {
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack stack = user.getStackInHand(hand);
         ItemStack otherStack = user.getStackInHand(Hand.OFF_HAND);
-        if(hand == Hand.OFF_HAND) {
+        if (hand == Hand.OFF_HAND) {
             otherStack = user.getStackInHand(Hand.MAIN_HAND);
         }
-        if(stack.getNbt() == null) {
+        if (stack.getNbt() == null) {
             user.setStackInHand(hand, setTeleported(stack, false));
         }
-        if(ContractItem.isViable(otherStack) && !user.getItemCooldownManager().isCoolingDown(stack.getItem())) {
+        if (ContractItem.isViable(otherStack) && !user.getItemCooldownManager().isCoolingDown(stack.getItem())) {
             PlayerEntity player = world.getPlayerByUuid(ContractItem.getIndebtedUUID(otherStack));
-            if(player != null) {
-                if(!getTeleported(stack)) {
-                user.setStackInHand(hand, putTeleported(stack, (float) user.getPos().x, (float) user.getPos().y, (float) user.getPos().z));
-                user.setStackInHand(hand, setTeleported(stack, true));
-                user.setPosition(player.getPos());
-                user.addStatusEffect(new StatusEffectInstance(StatusEffects.INVISIBILITY, 200, 0, false, false));
+            if (player != null) {
+                if (!getTeleported(stack)) {
+                    user.setStackInHand(hand, putTeleported(stack, (float) user.getPos().x, (float) user.getPos().y, (float) user.getPos().z));
+                    user.setStackInHand(hand, setTeleported(stack, true));
+                    user.setPosition(player.getPos());
+                    user.addStatusEffect(new StatusEffectInstance(StatusEffects.INVISIBILITY, 200, 0, false, false));
                 } else {
                     assert stack.getNbt() != null;
                     NbtCompound poss = stack.getNbt().getCompound("prevPos");
@@ -87,13 +88,12 @@ public class MerchantCrestItem extends Item {
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
 
-        if(!world.isClient && entity instanceof ServerPlayerEntity)
-        {
+        if (!world.isClient && entity instanceof ServerPlayerEntity) {
             ServerPlayerEntity player = (ServerPlayerEntity) entity;
 
 
             for (ItemStack itemStack : player.getInventory().main) {
-                if(!itemStack.isEmpty() && ContractItem.isViable(itemStack)) {
+                if (!itemStack.isEmpty() && ContractItem.isViable(itemStack)) {
                     Vec3d pos = player.getPos();
                     List<PlayerEntity> entities = player.getEntityWorld().getEntitiesByClass(
                             PlayerEntity.class,
@@ -104,7 +104,7 @@ public class MerchantCrestItem extends Item {
                     );
 
                     for (PlayerEntity nearbyEntity : entities) {
-                        if(nearbyEntity.getUuid() == ContractItem.getIndebtedUUID(itemStack) && player.getHealth() < player.getMaxHealth() && nearbyEntity.getHealth() > 1) {
+                        if (nearbyEntity.getUuid() == ContractItem.getIndebtedUUID(itemStack) && player.getHealth() < player.getMaxHealth() && nearbyEntity.getHealth() > 1) {
                             player.heal(1);
                             nearbyEntity.damage(DamageSource.STARVE, 1);
                         }

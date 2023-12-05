@@ -14,10 +14,11 @@ import net.minecraft.util.Identifier;
 public class CharterComponents implements WorldComponentInitializer, EntityComponentInitializer {
     public static final ComponentKey<CharterOwnerComponent> CHARTER_OWNER_COMPONENT = ComponentRegistry.getOrCreate(new Identifier(Charter.MODID, "owner"), CharterOwnerComponent.class);
     public static final ComponentKey<CharterWorldComponent> CHARTERS = ComponentRegistryV3.INSTANCE.getOrCreate(new Identifier(Charter.MODID, "charter_key"), CharterWorldComponent.class);
-   @Override
-   public void registerWorldComponentFactories(WorldComponentFactoryRegistry registry) {
-       registry.register(CHARTERS, CharterWorldComponent::new);
-   }
+
+    @Override
+    public void registerWorldComponentFactories(WorldComponentFactoryRegistry registry) {
+        registry.register(CHARTERS, CharterWorldComponent::new);
+    }
 
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {

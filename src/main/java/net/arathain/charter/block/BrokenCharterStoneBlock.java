@@ -12,18 +12,20 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
 import java.util.List;
-import java.util.Random;
 
 public class BrokenCharterStoneBlock extends Block {
     public static final VoxelShape SHAPE = createCuboidShape(2, 0, 2, 14, 32, 14);
+
     public BrokenCharterStoneBlock(Settings settings) {
         super(settings);
     }
+
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return SHAPE;
@@ -35,16 +37,16 @@ public class BrokenCharterStoneBlock extends Block {
         int i = pos.getX();
         int j = pos.getY();
         int k = pos.getZ();
-        double d = (double)i + random.nextDouble();
-        double e = (double)j + 0.7;
-        double f = (double)k + random.nextDouble();
+        double d = (double) i + random.nextDouble();
+        double e = (double) j + 0.7;
+        double f = (double) k + random.nextDouble();
         world.addParticle(ParticleTypes.LARGE_SMOKE, d, e, f, 0.0, 0.0, 0.0);
         BlockPos.Mutable mutable = new BlockPos.Mutable();
         for (int l = 0; l < 14; ++l) {
             mutable.set(i + MathHelper.nextInt(random, -10, 10), j - random.nextInt(10), k + MathHelper.nextInt(random, -10, 10));
             BlockState blockState = world.getBlockState(mutable);
             if (blockState.isFullCube(world, mutable)) continue;
-            world.addParticle(ParticleTypes.LARGE_SMOKE, (double)mutable.getX() + random.nextDouble(), (double)mutable.getY() + 4 + random.nextDouble(), (double)mutable.getZ() + random.nextDouble(), 0.0, 0.0, 0.0);
+            world.addParticle(ParticleTypes.LARGE_SMOKE, (double) mutable.getX() + random.nextDouble(), (double) mutable.getY() + 4 + random.nextDouble(), (double) mutable.getZ() + random.nextDouble(), 0.0, 0.0, 0.0);
         }
     }
 
@@ -60,11 +62,11 @@ public class BrokenCharterStoneBlock extends Block {
         );
         if (!world.isClient) {
             for (LivingEntity entity : entities) {
-                if(entity instanceof HostileEntity) {
+                if (entity instanceof HostileEntity) {
                     entity.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 640, 2));
                     entity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 20, 1));
                 }
-                if(entity instanceof PlayerEntity) {
+                if (entity instanceof PlayerEntity) {
                     entity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 640, 2));
                     entity.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 640, 5));
                     entity.addStatusEffect(new StatusEffectInstance(StatusEffects.WITHER, 120, 1));

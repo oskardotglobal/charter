@@ -44,7 +44,7 @@ public class SwapperBlock extends PillarBlock {
         if (!world.isClient) {
             boolean bl = world.isReceivingRedstonePower(pos);
             if (state.get(POWERED) != bl) {
-                world.setBlockState(pos, (BlockState)state.with(POWERED, bl), Block.NOTIFY_LISTENERS);
+                world.setBlockState(pos, (BlockState) state.with(POWERED, bl), Block.NOTIFY_LISTENERS);
                 if (bl) {
                     BlockPos pos1 = pos.offset(state.get(Properties.AXIS), 1);
                     BlockPos pos2 = pos.offset(state.get(Properties.AXIS), -1);
@@ -72,7 +72,7 @@ public class SwapperBlock extends PillarBlock {
                                     press2.setStack(0, stack1);
                                     press1.markDirty();
                                     press2.markDirty();
-                                    if(player1 != null && player2 != null && player1 != player2) {
+                                    if (player1 != null && player2 != null && player1 != player2) {
                                         boolean bool = player1.getEntityWorld() == player2.getEntityWorld();
                                         if (bool) {
                                             PlayerInventory inv1 = player1.getInventory();

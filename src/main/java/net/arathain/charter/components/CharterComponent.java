@@ -26,155 +26,160 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class CharterComponent implements SendHelpComponent {
-	private BlockPos charterStonePos;
-	private UUID owner;
-	private int uses;
-	private final World world;
+    private BlockPos charterStonePos;
+    private UUID owner;
+    private int uses;
+    private final World world;
 
-	public CharterComponent(World newWorld) {
-		world = newWorld;
-	}
+    public CharterComponent(World newWorld) {
+        world = newWorld;
+    }
 
-	public CharterComponent(BlockPos charterStone, PlayerEntity owner, World world) {
-		this.charterStonePos = charterStone;
-		this.owner = owner.getUuid();
-		this.world = world;
-		this.area.add(Box.of(Vec3d.of(charterStone), 65, 65, 65));
-		this.members.add(this.owner);
-		this.uses = 0;
-	}
-	public void killCharter() {
-		this.getAreas().forEach(area -> {
-			BlockState state = world.getBlockState(new BlockPos(area.getCenter().x, area.getCenter().y, area.getCenter().z));
-			if(state.getBlock() instanceof WaystoneBlock) {
-				world.breakBlock(new BlockPos(area.getCenter().x, area.getCenter().y, area.getCenter().z), false);
-				world.setBlockState(new BlockPos(area.getCenter().x, area.getCenter().y, area.getCenter().z), Charter.BROKEN_WAYSTONE.getDefaultState());
-			}
-			if(state.getBlock() instanceof CharterStoneBlock) {
-				world.breakBlock(new BlockPos(area.getCenter().x, area.getCenter().y, area.getCenter().z), false);
-				world.setBlockState(new BlockPos(area.getCenter().x, area.getCenter().y, area.getCenter().z), Charter.BROKEN_CHARTER_STONE.getDefaultState());
-			}
-		});
-		this.getMembers().forEach(member -> {
-			PlayerEntity player = world.getPlayerByUuid(member);
-			if(player != null) {
-				player.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 100, 5));
-			}
-		});
-		CharterComponents.CHARTERS.get(world).getCharters().removeIf(charter -> charter.equals(this));
-	}
+    public CharterComponent(BlockPos charterStone, PlayerEntity owner, World world) {
+        this.charterStonePos = charterStone;
+        this.owner = owner.getUuid();
+        this.world = world;
+        this.area.add(Box.of(Vec3d.of(charterStone), 65, 65, 65));
+        this.members.add(this.owner);
+        this.uses = 0;
+    }
 
-	public void tick() {
-		BlockState upState = world.getBlockState(charterStonePos.offset(Direction.UP));
-		if (upState.getBlock() != Blocks.AIR && upState.getBlock() != Blocks.WATER) {
-			world.breakBlock(charterStonePos.offset(Direction.UP), true);
-		}
+    public void killCharter() {
+        this.getAreas().forEach(area -> {
+            BlockState state = world.getBlockState(new BlockPos(area.getCenter().x, area.getCenter().y, area.getCenter().z));
+            if (state.getBlock() instanceof WaystoneBlock) {
+                world.breakBlock(new BlockPos(area.getCenter().x, area.getCenter().y, area.getCenter().z), false);
+                world.setBlockState(new BlockPos(area.getCenter().x, area.getCenter().y, area.getCenter().z), Charter.BROKEN_WAYSTONE.getDefaultState());
+            }
+            if (state.getBlock() instanceof CharterStoneBlock) {
+                world.breakBlock(new BlockPos(area.getCenter().x, area.getCenter().y, area.getCenter().z), false);
+                world.setBlockState(new BlockPos(area.getCenter().x, area.getCenter().y, area.getCenter().z), Charter.BROKEN_CHARTER_STONE.getDefaultState());
+            }
+        });
+        this.getMembers().forEach(member -> {
+            PlayerEntity player = world.getPlayerByUuid(member);
+            if (player != null) {
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 100, 5));
+            }
+        });
+        CharterComponents.CHARTERS.get(world).getCharters().removeIf(charter -> charter.equals(this));
+    }
 
-		List<UUID> memberList3 = new ArrayList<>(members);
-		for(UUID member : memberList3) {
-			PlayerEntity player = world.getPlayerByUuid(member);
-			if (player != null && Objects.equals(CharterUtil.getCharterAtPos(player.getPos(), player.world), this)) {
-				player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 1000));
-			}
-			if(player != null && uses > 10000) {
-				player.addStatusEffect(new StatusEffectInstance(Charter.SOUL_STRAIN, 1000, Math.toIntExact((uses / 10000) - 1)));
-			}
-		}
-		uses++;
+    public void tick() {
+        BlockState upState = world.getBlockState(charterStonePos.offset(Direction.UP));
+        if (upState.getBlock() != Blocks.AIR && upState.getBlock() != Blocks.WATER) {
+            world.breakBlock(charterStonePos.offset(Direction.UP), true);
+        }
 
-	}
-	public void incrementUses(int increment) {
-		if(increment == 1) {
-			this.uses++;
-		} else {
-			this.uses = uses + increment;
-		}
-	}
-	public void decrementUses(int decrement) {
-		if(decrement == 1) {
-			this.uses--;
-		} else {
-			this.uses = uses - decrement;
-		}
-	}
-	public int getUses() {
-		return uses;
-	}
+        List<UUID> memberList3 = new ArrayList<>(members);
+        for (UUID member : memberList3) {
+            PlayerEntity player = world.getPlayerByUuid(member);
+            if (player != null && Objects.equals(CharterUtil.getCharterAtPos(player.getPos(), player.world), this)) {
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 1000));
+            }
+            if (player != null && uses > 10000) {
+                player.addStatusEffect(new StatusEffectInstance(Charter.SOUL_STRAIN, 1000, Math.toIntExact((uses / 10000) - 1)));
+            }
+        }
+        uses++;
 
-	public BlockPos getCharterStonePos() {
-		return charterStonePos;
-	}
+    }
 
-	public UUID getCharterOwnerUuid() {
-		return owner;
-	}
+    public void incrementUses(int increment) {
+        if (increment == 1) {
+            this.uses++;
+        } else {
+            this.uses = uses + increment;
+        }
+    }
 
-	public void writeToNbt(@NotNull NbtCompound tag) {
-		NbtCompound rootTag = new NbtCompound();
-		NbtList areaListTag = new NbtList();
-		NbtList memberListTag = new NbtList();
+    public void decrementUses(int decrement) {
+        if (decrement == 1) {
+            this.uses--;
+        } else {
+            this.uses = uses - decrement;
+        }
+    }
 
+    public int getUses() {
+        return uses;
+    }
 
-		rootTag.putUuid("CharterOwner", owner);
-		rootTag.put("CharterStonePos", NbtHelper.fromBlockPos(charterStonePos));
-		rootTag.putInt("Uses", uses);
+    public BlockPos getCharterStonePos() {
+        return charterStonePos;
+    }
 
-		List<Box> areas = new ArrayList<>(area);
-		for(Box box : areas) {
-			NbtCompound boxCompound = new NbtCompound();
+    public UUID getCharterOwnerUuid() {
+        return owner;
+    }
 
-			boxCompound.put("Center", NbtHelper.fromBlockPos(new BlockPos(box.getCenter().x, box.getCenter().y, box.getCenter().z)));
-			boxCompound.putDouble("LengthX", box.getXLength());
-			boxCompound.putDouble("LengthY", box.getYLength());
-			boxCompound.putDouble("LengthZ", box.getZLength());
-			areaListTag.add(boxCompound);
-		}
+    public void writeToNbt(@NotNull NbtCompound tag) {
+        NbtCompound rootTag = new NbtCompound();
+        NbtList areaListTag = new NbtList();
+        NbtList memberListTag = new NbtList();
 
 
-		List<UUID> membrs = new ArrayList<>(members);
-		for(UUID member : membrs) {
-			memberListTag.add(NbtHelper.fromUuid(member));
-		}
+        rootTag.putUuid("CharterOwner", owner);
+        rootTag.put("CharterStonePos", NbtHelper.fromBlockPos(charterStonePos));
+        rootTag.putInt("Uses", uses);
 
-		rootTag.put("CharterArea", areaListTag);
-		rootTag.put("CharterMembers", memberListTag);
-		tag.put(Charter.MODID, rootTag);
-	}
+        List<Box> areas = new ArrayList<>(area);
+        for (Box box : areas) {
+            NbtCompound boxCompound = new NbtCompound();
 
-	public List<Box> getAreas() {
-		return area;
-	}
+            boxCompound.put("Center", NbtHelper.fromBlockPos(new BlockPos(box.getCenter().x, box.getCenter().y, box.getCenter().z)));
+            boxCompound.putDouble("LengthX", box.getXLength());
+            boxCompound.putDouble("LengthY", box.getYLength());
+            boxCompound.putDouble("LengthZ", box.getZLength());
+            areaListTag.add(boxCompound);
+        }
 
-	public void addArea(Box newArea){
-		area.add(newArea);
-	}
-	public void addWaystone(BlockPos pos) {
-		Vec3d vecPos = new Vec3d(pos.getX(), pos.getY(), pos.getZ());
-		Box box = Box.of(vecPos, 33, 33, 33);
-		addArea(box);
-	}
 
-	public List<UUID> getMembers() {
-		return members;
-	}
+        List<UUID> membrs = new ArrayList<>(members);
+        for (UUID member : membrs) {
+            memberListTag.add(NbtHelper.fromUuid(member));
+        }
 
-	public void readFromNbt(NbtCompound tag) {
-		NbtCompound rootTag = tag.getCompound(Charter.MODID);
-		NbtList areaListTag = rootTag.getList("CharterArea", NbtElement.COMPOUND_TYPE);
-		NbtList memberListTag = rootTag.getList("CharterMembers", NbtElement.INT_ARRAY_TYPE);
-		area.clear();
-		members.clear();
+        rootTag.put("CharterArea", areaListTag);
+        rootTag.put("CharterMembers", memberListTag);
+        tag.put(Charter.MODID, rootTag);
+    }
 
-		owner = rootTag.getUuid("CharterOwner");
-		charterStonePos = NbtHelper.toBlockPos(rootTag.getCompound("CharterStonePos"));
-		uses = rootTag.getInt("Uses");
+    public List<Box> getAreas() {
+        return area;
+    }
 
-		for(NbtElement boxElement : areaListTag) {
-			NbtCompound boxCompound = (NbtCompound) boxElement;
-			area.add(Box.of(Vec3d.of(NbtHelper.toBlockPos(boxCompound.getCompound("Center"))), boxCompound.getDouble("LengthX"), boxCompound.getDouble("LengthY"), boxCompound.getDouble("LengthZ")));
-		}
-		for(NbtElement member : memberListTag) {
-			members.add(NbtHelper.toUuid(member));
-		}
-	}
+    public void addArea(Box newArea) {
+        area.add(newArea);
+    }
+
+    public void addWaystone(BlockPos pos) {
+        Vec3d vecPos = new Vec3d(pos.getX(), pos.getY(), pos.getZ());
+        Box box = Box.of(vecPos, 33, 33, 33);
+        addArea(box);
+    }
+
+    public List<UUID> getMembers() {
+        return members;
+    }
+
+    public void readFromNbt(NbtCompound tag) {
+        NbtCompound rootTag = tag.getCompound(Charter.MODID);
+        NbtList areaListTag = rootTag.getList("CharterArea", NbtElement.COMPOUND_TYPE);
+        NbtList memberListTag = rootTag.getList("CharterMembers", NbtElement.INT_ARRAY_TYPE);
+        area.clear();
+        members.clear();
+
+        owner = rootTag.getUuid("CharterOwner");
+        charterStonePos = NbtHelper.toBlockPos(rootTag.getCompound("CharterStonePos"));
+        uses = rootTag.getInt("Uses");
+
+        for (NbtElement boxElement : areaListTag) {
+            NbtCompound boxCompound = (NbtCompound) boxElement;
+            area.add(Box.of(Vec3d.of(NbtHelper.toBlockPos(boxCompound.getCompound("Center"))), boxCompound.getDouble("LengthX"), boxCompound.getDouble("LengthY"), boxCompound.getDouble("LengthZ")));
+        }
+        for (NbtElement member : memberListTag) {
+            members.add(NbtHelper.toUuid(member));
+        }
+    }
 }

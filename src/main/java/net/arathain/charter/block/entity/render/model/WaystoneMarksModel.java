@@ -17,17 +17,17 @@ private static final Identifier MODEL_IDENTIFIER = new Identifier(Charter.MODID,
 private static final Identifier ANIMATION_IDENTIFIER = new Identifier(Charter.MODID, "animations/waystone.animation.json");
 
 @Override
-public Identifier getModelLocation(WaystoneEntity object) {
+public Identifier getModelResource(WaystoneEntity object) {
         return MODEL_IDENTIFIER;
         }
 
 @Override
-public Identifier getTextureLocation(WaystoneEntity object) {
+public Identifier getTextureResource(WaystoneEntity object) {
         return TEXTURE_IDENTIFIER;
         }
 
 @Override
-public Identifier getAnimationFileLocation(WaystoneEntity animatable) {
+public Identifier getAnimationResource(WaystoneEntity animatable) {
         return ANIMATION_IDENTIFIER;
         }
 

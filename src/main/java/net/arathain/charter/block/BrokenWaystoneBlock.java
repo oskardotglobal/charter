@@ -9,9 +9,11 @@ import net.minecraft.world.BlockView;
 
 public class BrokenWaystoneBlock extends Block {
     public static final VoxelShape SHAPE = createCuboidShape(2, 0, 2, 14, 16, 14);
+
     public BrokenWaystoneBlock(Settings settings) {
         super(settings);
     }
+
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return SHAPE;

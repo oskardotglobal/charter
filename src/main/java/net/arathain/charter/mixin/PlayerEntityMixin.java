@@ -25,36 +25,36 @@ import net.minecraft.world.biome.BiomeKeys;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.*;
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends LivingEntity implements SlowFallEntity {
-    protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) { super(entityType, world); }
+    protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
+        super(entityType, world);
+    }
 
-    @Shadow protected HungerManager hungerManager;
+    @Shadow
+    protected HungerManager hungerManager;
 
     @Inject(method = "tick", at = @At("HEAD"))
     public void headTick(CallbackInfo info) {
-        if(CharterUtil.isCharterOwner(this, this.getWorld())) {
-            if(isFallFlying()) {
-                if(forwardSpeed > 0 && getBlockY() - getAverageHeight() <= 64)
+        if (CharterUtil.ownsCurrentCharter(this.getBlockPos(), this.getUuid(), this.getWorld())) {
+            if (isFallFlying()) {
+                if (forwardSpeed > 0 && getBlockY() - getAverageHeight() <= 64)
                     CharterUtil.applySpeed((PlayerEntity) (Object) this);
-                setSlowFalling(false);
-                if((isSneaking()) || isSubmergedInWater())
+                charter$setSlowFalling(false);
+                if ((isSneaking()) || isSubmergedInWater())
                     CharterUtil.stopFlying((PlayerEntity) (Object) this);
-            }
-            else {
-                if(isOnGround() || isTouchingWater())
-                    setSlowFalling(false);
+            } else {
+                if (isOnGround() || isTouchingWater())
+                    charter$setSlowFalling(false);
 
-                if(isSlowFalling()) {
+                if (charter$isSlowFalling()) {
                     fallDistance = 0F;
                     setVelocity(getVelocity().x, -0.0001, getVelocity().z);
                 }
@@ -70,7 +70,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements SlowFall
         if (this.hasStatusEffect(Charter.ETERNAL_DEBT) && !this.world.isClient) {
             hungerManager.setSaturationLevel(0);
             if (this.isInsideWaterOrBubbleColumn()) {
-                if (this.getEntityWorld().getBiomeKey(this.getBlockPos()).equals(Optional.of(BiomeKeys.RIVER))) {
+                if (this.getEntityWorld().getBiomeAccess().getBiome(this.getBlockPos()).getKey().equals(Optional.of(BiomeKeys.RIVER))) {
                     this.addStatusEffect(new StatusEffectInstance(StatusEffects.WITHER, 60, 2, false, false));
                 }
                 this.addStatusEffect(new StatusEffectInstance(StatusEffects.WITHER, 40, 1, false, false));
@@ -78,19 +78,19 @@ public abstract class PlayerEntityMixin extends LivingEntity implements SlowFall
         }
     }
 
-    @Inject(method= "onDeath", at = @At("HEAD"))
+    @Inject(method = "onDeath", at = @At("HEAD"))
     private void death(DamageSource source, CallbackInfo ci) {
         CharterComponent charter = CharterUtil.getCharterAtPos(this.getPos(), this.world);
-        if(charter != null) {
+        if (charter != null) {
             if (this.getUuid().equals(charter.getCharterOwnerUuid())) {
                 List<Box> boxes = new ArrayList<>(charter.getAreas());
                 boxes.forEach(area -> {
                     if (area.contains(this.getPos())) {
                         BlockState state = world.getBlockState(new BlockPos(area.getCenter().x, area.getCenter().y, area.getCenter().z));
-                        if(state.getBlock() instanceof CharterStoneBlock) {
+                        if (state.getBlock() instanceof CharterStoneBlock) {
                             world.breakBlock(new BlockPos(area.getCenter().x, area.getCenter().y, area.getCenter().z), false);
                         }
-                        if(state.getBlock() instanceof WaystoneBlock) {
+                        if (state.getBlock() instanceof WaystoneBlock) {
                             charter.decrementUses(-1000);
                             BlockPos pos = new BlockPos(area.getCenter().x, area.getCenter().y, area.getCenter().z);
                             world.breakBlock(pos, true);
@@ -101,12 +101,12 @@ public abstract class PlayerEntityMixin extends LivingEntity implements SlowFall
                 });
             } else {
                 charter.getMembers().forEach(member -> {
-                    if(member.equals(uuid)) {
+                    if (member.equals(uuid)) {
                         List<Box> boxes = new ArrayList<>(charter.getAreas());
                         boxes.forEach(area -> {
                             if (area.contains(this.getPos())) {
                                 BlockState state = world.getBlockState(new BlockPos(area.getCenter().x, area.getCenter().y, area.getCenter().z));
-                                if(state.getBlock() instanceof WaystoneBlock) {
+                                if (state.getBlock() instanceof WaystoneBlock) {
                                     charter.decrementUses(-250);
                                     BlockPos pos = new BlockPos(area.getCenter().x, area.getCenter().y, area.getCenter().z);
                                     world.breakBlock(pos, true);
@@ -123,16 +123,15 @@ public abstract class PlayerEntityMixin extends LivingEntity implements SlowFall
     }
 
 
-
     @Inject(method = "damage", at = @At("HEAD"), cancellable = true)
     private void dmg(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         if (source.getAttacker() instanceof PlayerEntity attacker) {
             List<CharterComponent> charters = new ArrayList<>(CharterComponents.CHARTERS.get(this.world).getCharters());
             charters.forEach(charterComponent -> {
-                if(charterComponent.getCharterOwnerUuid().equals(this.getUuid())) {
+                if (charterComponent.getCharterOwnerUuid().equals(this.getUuid())) {
                     List<UUID> members = new ArrayList<>(charterComponent.getMembers());
                     members.forEach(member -> {
-                        if(member.equals(attacker.getUuid())) {
+                        if (member.equals(attacker.getUuid())) {
                             cir.setReturnValue(false);
                         }
                     });
@@ -170,14 +169,16 @@ public abstract class PlayerEntityMixin extends LivingEntity implements SlowFall
 
     }
 
-    @Unique public boolean slowFalling = false;
+    @Unique
+    public boolean slowFalling = false;
+
     @Override
-    public void setSlowFalling(boolean slowFalling) {
+    public void charter$setSlowFalling(boolean slowFalling) {
         this.slowFalling = slowFalling;
     }
 
     @Override
-    public boolean isSlowFalling() {
+    public boolean charter$isSlowFalling() {
         return slowFalling;
     }
 
@@ -185,7 +186,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements SlowFall
     protected boolean tryUseTotem(DamageSource source) {
         if (this.hasStatusEffect(Charter.ETERNAL_DEBT) && source.isUnblockable()) {
             this.setHealth(1.0F);
-            if(this.hasStatusEffect(StatusEffects.WEAKNESS) && Objects.requireNonNull(this.getStatusEffect(StatusEffects.WEAKNESS)).getAmplifier() > 1) {
+            if (this.hasStatusEffect(StatusEffects.WEAKNESS) && Objects.requireNonNull(this.getStatusEffect(StatusEffects.WEAKNESS)).getAmplifier() > 1) {
                 this.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 300, 4));
                 this.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 300, 4));
                 this.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 600, 1));
@@ -196,14 +197,15 @@ public abstract class PlayerEntityMixin extends LivingEntity implements SlowFall
             return super.tryUseTotem(source);
         }
     }
+
     @Unique
     public int getAverageHeight() {
         int averageHeight = 0;
         int radius = 2;
         int diameter = (radius * 2) + 1;
 
-        for(int x = -radius; x <= radius; x++)
-            for(int z = -radius; z <= radius; z++)
+        for (int x = -radius; x <= radius; x++)
+            for (int z = -radius; z <= radius; z++)
                 averageHeight += world.getTopY(Heightmap.Type.MOTION_BLOCKING, getBlockX() + x, getBlockZ() + z);
 
         return averageHeight / (diameter * diameter);

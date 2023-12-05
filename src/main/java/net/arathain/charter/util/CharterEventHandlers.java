@@ -40,11 +40,12 @@ public class CharterEventHandlers {
             return !result.equals(ActionResult.FAIL);
         });
     }
+
     private static ActionResult checkCharter(CharterComponent charter, PlayerEntity player) {
-        if(charter != null) {
+        if (charter != null) {
             List<UUID> memberList2 = new ArrayList<>(charter.getMembers());
-            for(UUID uuid : memberList2) {
-                if(uuid.equals(player.getUuid())) {
+            for (UUID uuid : memberList2) {
+                if (uuid.equals(player.getUuid())) {
                     return ActionResult.PASS;
                 }
             }

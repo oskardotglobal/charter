@@ -23,10 +23,10 @@ import java.util.UUID;
 public class CharterStoneEntity extends BlockEntity implements IAnimatable {
     private final AnimationFactory factory = new AnimationFactory(this);
     public static final AnimationBuilder IDLE = new AnimationBuilder().addAnimation("animation.model.idle");
+
     public CharterStoneEntity(BlockPos pos, BlockState state) {
         super(Charter.CHARTER_STONE_ENTITY, pos, state);
     }
-
 
 
     @Override
